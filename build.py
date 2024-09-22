@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 
@@ -33,9 +34,17 @@ for child_dir in child_dirs:
                     writer.add_page(reader.pages[page_num])
 
     # Specify the output file name
-    output_file_name = 'pacbot_sw_' + Path(child_dir).name + '.pdf'
-    output_file = script_dir / "out" / output_file_name
+    child_dir_name = Path(child_dir).name
+    output_file_name = 'pacbot_sw_' + child_dir_name + '.pdf'
+    output_file = script_dir / 'slides' / child_dir_name / output_file_name
+
     Path(output_file).parent.mkdir(parents=True, exist_ok=True)
+
+    readme_src = (child_dir / 'README.md').absolute()
+    if readme_src.exists:
+        readme_dst = Path(output_file).parent / 'README.md'
+        shutil.copyfile(readme_src, readme_dst)
+        print(f'Copied {readme_src} to {readme_dst}')
 
     # Write the merged PDF to the output file
     if len(writer.pages):
